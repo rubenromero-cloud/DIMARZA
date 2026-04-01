@@ -63,6 +63,7 @@
     .fila-botones {
       display: flex;
       gap: 12px;
+      margin-top: 18px;
     }
 
     .fila-botones button {
@@ -145,13 +146,36 @@
       margin-top: 10px;
     }
 
-    .sin-items {
-      color: #6b7280;
+    .pasos {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .paso-indicador {
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      color: #374151;
       font-size: 13px;
-      margin-top: 8px;
+      font-weight: bold;
+    }
+
+    .paso-activo {
+      background: #2563eb;
+      color: white;
     }
 
     @media (max-width: 768px) {
+      body {
+        padding: 12px;
+      }
+
+      .contenedor {
+        padding: 16px;
+      }
+
       .grid {
         grid-template-columns: 1fr;
       }
@@ -159,12 +183,89 @@
       .fila-botones {
         flex-direction: column;
       }
+
+      .tabla-items,
+      .tabla-items thead,
+      .tabla-items tbody,
+      .tabla-items th,
+      .tabla-items td,
+      .tabla-items tr {
+        display: block;
+        width: 100%;
+      }
+
+      .tabla-items thead {
+        display: none;
+      }
+
+      .tabla-items tr {
+        background: #f8fafc;
+        border: 1px solid #dbe3ea;
+        border-radius: 10px;
+        padding: 12px;
+        margin-bottom: 12px;
+      }
+
+      .tabla-items td {
+        border: none;
+        padding: 6px 0;
+        text-align: left;
+      }
+
+      .tabla-items td select,
+      .tabla-items td input,
+      .tabla-items td button {
+        width: 100%;
+      }
+
+      .tabla-items td:nth-child(1)::before {
+        content: "Grupo";
+        display: block;
+        font-weight: bold;
+        margin-bottom: 6px;
+        color: #374151;
+      }
+
+      .tabla-items td:nth-child(2)::before {
+        content: "Subgrupo";
+        display: block;
+        font-weight: bold;
+        margin-bottom: 6px;
+        color: #374151;
+      }
+
+      .tabla-items td:nth-child(3)::before {
+        content: "Cantidad";
+        display: block;
+        font-weight: bold;
+        margin-bottom: 6px;
+        color: #374151;
+      }
+
+      .tabla-items td:nth-child(4)::before {
+        content: "Acción";
+        display: block;
+        font-weight: bold;
+        margin-bottom: 6px;
+        color: #374151;
+      }
+
+      .btn-x,
+      .btn-mas {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
   <div class="contenedor">
     <h2>Registro de Movimientos</h2>
+
+    <div class="pasos">
+      <div class="paso-indicador paso-activo" id="indicador1">Paso 1</div>
+      <div class="paso-indicador" id="indicador2">Paso 2</div>
+      <div class="paso-indicador" id="indicador3">Paso 3</div>
+    </div>
 
     <div id="paso1">
       <h3>Paso 1: Selecciona origen, destino y responsable</h3>
@@ -213,7 +314,7 @@
     </div>
 
     <div id="paso2" class="oculto">
-      <h3>Paso 2: Completa el movimiento</h3>
+      <h3>Paso 2: Completa los datos generales</h3>
 
       <div class="resumen">
         <div><strong>Origen:</strong> <span id="resumenOrigen"></span></div>
@@ -254,28 +355,43 @@
         </div>
       </div>
 
-      <div class="full" style="margin-top:18px;">
-        <h3>Ítems del movimiento</h3>
+      <div class="fila-botones">
+        <button type="button" class="btn-secundario" onclick="volverPaso1()">Volver</button>
+        <button type="button" class="btn-principal" onclick="irPaso3()">Siguiente</button>
+      </div>
+    </div>
 
-        <table class="tabla-items">
-          <thead>
-            <tr>
-              <th style="width: 30%;">Grupo</th>
-              <th style="width: 40%;">Subgrupo</th>
-              <th style="width: 20%;">Cantidad</th>
-              <th style="width: 10%;">Acción</th>
-            </tr>
-          </thead>
-          <tbody id="tbodyItems"></tbody>
-        </table>
+    <div id="paso3" class="oculto">
+      <h3>Paso 3: Ítems del movimiento</h3>
 
-        <div class="acciones-items">
-          <button type="button" class="btn-mas" onclick="agregarFilaItem()">+ Agregar ítem</button>
-        </div>
+      <div class="resumen">
+        <div><strong>Origen:</strong> <span id="resumenOrigen3"></span></div>
+        <div><strong>Destino:</strong> <span id="resumenDestino3"></span></div>
+        <div><strong>Responsable:</strong> <span id="resumenResponsable3"></span></div>
+        <div><strong>Fecha:</strong> <span id="resumenFecha3"></span></div>
+        <div><strong>Tipo:</strong> <span id="resumenTipo3"></span></div>
+        <div><strong>Contrato:</strong> <span id="resumenContrato3"></span></div>
+        <div><strong>Observación:</strong> <span id="resumenObservacion3"></span></div>
       </div>
 
-      <div class="full fila-botones" style="margin-top:18px;">
-        <button type="button" class="btn-secundario" onclick="volverPaso1()">Volver</button>
+      <table class="tabla-items">
+        <thead>
+          <tr>
+            <th style="width: 30%;">Grupo</th>
+            <th style="width: 40%;">Subgrupo</th>
+            <th style="width: 20%;">Cantidad</th>
+            <th style="width: 10%;">Acción</th>
+          </tr>
+        </thead>
+        <tbody id="tbodyItems"></tbody>
+      </table>
+
+      <div class="acciones-items">
+        <button type="button" class="btn-mas" onclick="agregarFilaItem()">+ Agregar ítem</button>
+      </div>
+
+      <div class="fila-botones">
+        <button type="button" class="btn-secundario" onclick="volverPaso2()">Volver</button>
         <button type="button" class="btn-principal" onclick="registrar()">Registrar movimiento</button>
       </div>
     </div>
@@ -294,6 +410,13 @@
       } catch (error) {
         document.getElementById('mensaje').textContent = 'Error cargando grupos: ' + error.message;
       }
+    }
+
+    function actualizarIndicador(pasoActivo) {
+      document.getElementById('indicador1').classList.remove('paso-activo');
+      document.getElementById('indicador2').classList.remove('paso-activo');
+      document.getElementById('indicador3').classList.remove('paso-activo');
+      document.getElementById('indicador' + pasoActivo).classList.add('paso-activo');
     }
 
     function irPaso2() {
@@ -320,16 +443,59 @@
 
       document.getElementById('paso1').classList.add('oculto');
       document.getElementById('paso2').classList.remove('oculto');
+      document.getElementById('paso3').classList.add('oculto');
 
-      if (document.getElementById('tbodyItems').children.length === 0) {
-        agregarFilaItem();
-      }
+      actualizarIndicador(2);
     }
 
     function volverPaso1() {
       document.getElementById('paso2').classList.add('oculto');
+      document.getElementById('paso3').classList.add('oculto');
       document.getElementById('paso1').classList.remove('oculto');
       document.getElementById('mensaje').textContent = '';
+
+      actualizarIndicador(1);
+    }
+
+    function irPaso3() {
+      const fecha = document.getElementById('fecha').value;
+      const tipo = document.getElementById('tipo').value;
+      const contrato = document.getElementById('contrato').value.trim();
+      const observacion = document.getElementById('observacion').value;
+      const mensaje = document.getElementById('mensaje');
+
+      mensaje.textContent = '';
+
+      if (!fecha || !tipo || !observacion) {
+        mensaje.textContent = 'Completa fecha, tipo y observación.';
+        return;
+      }
+
+      document.getElementById('resumenOrigen3').textContent = document.getElementById('origenPaso1').value;
+      document.getElementById('resumenDestino3').textContent = document.getElementById('destinoPaso1').value;
+      document.getElementById('resumenResponsable3').textContent = document.getElementById('responsablePaso1').value.trim();
+      document.getElementById('resumenFecha3').textContent = fecha;
+      document.getElementById('resumenTipo3').textContent = tipo;
+      document.getElementById('resumenContrato3').textContent = contrato || '-';
+      document.getElementById('resumenObservacion3').textContent = observacion;
+
+      document.getElementById('paso1').classList.add('oculto');
+      document.getElementById('paso2').classList.add('oculto');
+      document.getElementById('paso3').classList.remove('oculto');
+
+      if (document.getElementById('tbodyItems').children.length === 0) {
+        agregarFilaItem();
+      }
+
+      actualizarIndicador(3);
+    }
+
+    function volverPaso2() {
+      document.getElementById('paso3').classList.add('oculto');
+      document.getElementById('paso2').classList.remove('oculto');
+      document.getElementById('mensaje').textContent = '';
+
+      actualizarIndicador(2);
     }
 
     function crearSelectGrupo() {
@@ -485,12 +651,24 @@
         document.getElementById('origenPaso1').value = '';
         document.getElementById('destinoPaso1').value = '';
         document.getElementById('responsablePaso1').value = '';
+
         document.getElementById('resumenOrigen').textContent = '';
         document.getElementById('resumenDestino').textContent = '';
         document.getElementById('resumenResponsable').textContent = '';
 
+        document.getElementById('resumenOrigen3').textContent = '';
+        document.getElementById('resumenDestino3').textContent = '';
+        document.getElementById('resumenResponsable3').textContent = '';
+        document.getElementById('resumenFecha3').textContent = '';
+        document.getElementById('resumenTipo3').textContent = '';
+        document.getElementById('resumenContrato3').textContent = '';
+        document.getElementById('resumenObservacion3').textContent = '';
+
+        document.getElementById('paso3').classList.add('oculto');
         document.getElementById('paso2').classList.add('oculto');
         document.getElementById('paso1').classList.remove('oculto');
+
+        actualizarIndicador(1);
 
       } catch (error) {
         mensaje.textContent = 'Error: ' + error.message;
